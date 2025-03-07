@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_analytic_account_form_inherit_salesman" model="ir.ui.view">
+            <field name="name">account.analytic.account.form.inherit.salesman</field>
+            <field name="model">account.analytic.account</field>
+            <field name="inherit_id" ref="analytic.view_account_analytic_account_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='code']" position="after">
+                    <field name="salesman_id"/>
+                </xpath>
+            </field>
+        </record>
+        <record id="view_analytic_account_list_inherit_totals" model="ir.ui.view">
+            <field name="name">account.analytic.account.list.inherit.totals</field>
+            <field name="model">account.analytic.account</field>
+            <field name="inherit_id" ref="analytic.view_account_analytic_account_list"/>
+            <field name="arch" type="xml">
+                <xpath expr="//tree" position="inside">
+                    <field name="total_debit" string="Débito Total" sum="Total Debit"/>
+                    <field name="total_credit" string="Crédito Total" sum="Total Credit"/>
+                    <field name="total_balance" string="Balance Total" sum="Total Balance"/>
+                </xpath>
+            </field>
+        </record>
+        <!-- Menú Principal -->
+        <menuitem
+            id="menu_mercado_publico"
+            name="Mercado Público"
+            sequence="10"
+            web_icon="mercado_publico,static/description/icon.png"/>
+    </data>
+</odoo>
