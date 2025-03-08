@@ -20,6 +20,10 @@
                     <field name="total_debit" string="Débito Total" sum="Total Debit"/>
                     <field name="total_credit" string="Crédito Total" sum="Total Credit"/>
                     <field name="total_balance" string="Balance Total" sum="Total Balance"/>
+                    <field name="revenue"/>
+                    <field name="costs"/>
+                    <field name="profit_margin"/>
+                    <field name="profit_margin_percentage" widget="percentpie"/>
                 </xpath>
             </field>
         </record>

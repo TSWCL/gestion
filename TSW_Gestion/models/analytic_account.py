@@ -37,6 +37,27 @@ class AnalyticAccount(models.Model):
         compute="_compute_totals",
         store=True
     )
+    revenue = fields.Monetary(
+        string="Ingresos",
+        compute="_compute_profit_margin",
+        store=True
+    )
+    costs = fields.Monetary(
+        string="Costos",
+        compute="_compute_profit_margin",
+        store=True
+    )
+    profit_margin = fields.Monetary(
+        string="Margen de Ganancia",
+        compute="_compute_profit_margin",
+        store=True
+    )
+    profit_margin_percentage = fields.Float(
+        string="Margen de Ganancia (%)",
+        compute="_compute_profit_margin",
+        store=True
+    )
+    currency_id = fields.Many2one("res.currency", string="Moneda", default=lambda self: self.env.company.currency_id)
 
     @api.depends('debit', 'credit', 'balance')
     def _compute_totals(self):
@@ -80,3 +101,45 @@ class AnalyticAccount(models.Model):
                 rec.partner_id = False
                 rec.salesman_id = False
                 _logger.info("No se encontró una orden de venta para la cuenta analítica '%s'", rec.name)
+
+    @api.depends('name')
+    def _compute_profit_margin(self):
+        """
+        Calcula el margen de ganancia en base a las facturas finales asociadas a la cuenta analítica.
+        """
+        for rec in self:
+            total_revenue = 0
+            total_costs = 0
+
+            # Buscar todas las facturas de venta
+            invoices = self.env['account.move'].search([
+                ('move_type', '=', 'out_invoice'),
+                ('state', '=', 'posted')  # Solo facturas validadas
+            ])
+
+            # Buscar las líneas de factura y filtrar por `analytic_distribution`
+            for invoice in invoices:
+                for line in invoice.invoice_line_ids:
+                    analytic_data = line.analytic_distribution
+                    if analytic_data and str(rec.id) in analytic_data:
+                        total_revenue += line.price_subtotal  # Se suma el subtotal sin impuestos
+
+            # Buscar costos en las líneas de factura
+            cost_lines = self.env['account.move.line'].search([
+                ('account_id.internal_group', '=', 'expense'),
+                ('parent_state', '=', 'posted')  # Solo costos confirmados
+            ])
+
+            for cost in cost_lines:
+                analytic_data = cost.analytic_distribution
+                if analytic_data and str(rec.id) in analytic_data:
+                    total_costs += cost.debit  # Se suma el costo (cargos)
+
+            # Cálculo de margen de ganancia
+            rec.revenue = total_revenue
+            rec.costs = total_costs
+            rec.profit_margin = total_revenue - total_costs
+            rec.profit_margin_percentage = (rec.profit_margin / total_revenue * 100) if total_revenue > 0 else 0
+
+            _logger.info("Cuenta Analítica '%s': Ingresos = %s, Costos = %s, Margen = %s (%s%%)",
+                         rec.name, total_revenue, total_costs, rec.profit_margin, rec.profit_margin_percentage)
