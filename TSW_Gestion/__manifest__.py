@@ -14,5 +14,5 @@
         'views/analytic_account_view.xml',
     ],
     'installable': True,
-    'application': False,
+    'application': True,
 }

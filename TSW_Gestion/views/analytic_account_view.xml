@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+        <!-- Modificación del formulario para agregar el campo vendedor -->
         <record id="view_analytic_account_form_inherit_salesman" model="ir.ui.view">
             <field name="name">account.analytic.account.form.inherit.salesman</field>
             <field name="model">account.analytic.account</field>
@@ -11,6 +12,8 @@
                 </xpath>
             </field>
         </record>
+
+        <!-- Modificación de la vista de lista para agregar los totales -->
         <record id="view_analytic_account_list_inherit_totals" model="ir.ui.view">
             <field name="name">account.analytic.account.list.inherit.totals</field>
             <field name="model">account.analytic.account</field>
@@ -27,6 +30,7 @@
                 </xpath>
             </field>
         </record>
+
         <!-- Menú Principal -->
         <menuitem
             id="menu_mercado_publico"
